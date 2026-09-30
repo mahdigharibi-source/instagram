@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 
     # third party
     "debug_toolbar",
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -151,4 +152,15 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (),
     'DEFAULT_PERMISSION_CLASSES': (),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# config drf-spectacular
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'My API',
+    'DESCRIPTION': 'My Django REST Framework API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }

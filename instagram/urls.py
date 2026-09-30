@@ -1,3 +1,8 @@
 from rest_framework.routers import DefaultRouter
+from .views import ProfilesViewSet
+router = DefaultRouter()
+router.register('profiles', ProfilesViewSet, basename='profiles')
 
-from instagram.views import ProfileViewSet
+urlpatterns = []
+
+urlpatterns += router.urls

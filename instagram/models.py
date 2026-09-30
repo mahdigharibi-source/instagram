@@ -23,13 +23,12 @@ class Profile(Base):
     )
     bio = models.TextField(max_length=500, blank=True)
     profile_picture = models.ImageField(upload_to="profiles/", null=True, blank=True)
-    # posts
     # comments
     # liked_posts
 
 class Post(Base):
     user = models.ForeignKey(
-        to=CustomUser,
+        to=Profile,
         on_delete=models.CASCADE,
         related_name='posts',
     )
@@ -49,7 +48,7 @@ class Images(Base):
 
 class Comment(Base):
     user = models.ForeignKey(
-        to=CustomUser,
+        to=Profile,
         on_delete=models.CASCADE,
         related_name='comments',
     )
@@ -65,7 +64,7 @@ class Comment(Base):
 
 class Likes(Base):
     user = models.ForeignKey(
-        to=CustomUser,
+        to=Profile,
         on_delete=models.CASCADE,
         related_name='liked_posts',
     )

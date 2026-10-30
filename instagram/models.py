@@ -26,6 +26,9 @@ class Profile(Base):
     # comments
     # likes
 
+    def __str__(self):
+        return self.username
+
 class Post(Base):
     user = models.ForeignKey(
         to=Profile,
@@ -36,6 +39,9 @@ class Post(Base):
     # likes
     # images
     # comments
+
+    def __str__(self):
+        return self.caption[:10]
 
 class Images(Base):
     post = models.ForeignKey(
@@ -59,6 +65,9 @@ class Comment(Base):
     )
     text = models.TextField(max_length=500)
 
+    def __str__(self):
+        return self.text[:10]
+
 
 
 
@@ -74,3 +83,10 @@ class Likes(Base):
         related_name='likes',
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "post"],
+                name="unique_user_post_like"
+            )
+        ]

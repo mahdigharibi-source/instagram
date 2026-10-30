@@ -25,9 +25,6 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('instagram/', include('instagram.urls')),
-
-
     # add drf spectacular to project
     # Schema
     path(
@@ -47,11 +44,17 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name='schema'),
         name='redoc',
     ),
+
+    # main urls
+    path('instagram/', include('instagram.urls')),
+
 ]
+
+
 
 if settings.DEBUG:
     urlpatterns += [
+        path("silk/", include("silk.urls", namespace="silk")),
+
         path("__debug__/", include("debug_toolbar.urls")),
     ]
-
-

@@ -17,6 +17,10 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
+# media
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
@@ -48,11 +52,14 @@ INSTALLED_APPS = [
     # third party
     "debug_toolbar",
     'drf_spectacular',
+    "silk",
 ]
 
 MIDDLEWARE = [
     # debug toolbar
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    # silk
+    "silk.middleware.SilkyMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -153,6 +160,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (),
     'DEFAULT_PERMISSION_CLASSES': (),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_THROTTLE_CLASSES': [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "5/minute",
+        "user": "15/minute",
+    },
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -1,5 +1,7 @@
+from drf_spectacular.utils import extend_schema
+from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
 from rest_framework.viewsets import ModelViewSet
-from .serializers import ProfileSerializer, PostSerializer
+from .serializers import ProfileSerializer, PostWriteSerializer, PostReadSerializer
 from instagram.models import Profile, Post
 
 
@@ -11,9 +13,54 @@ class ProfilesViewSet(ModelViewSet):
                 )
 
 
-class PostViewSet(ModelViewSet):
-    serializer_class = PostSerializer
-    queryset = (Post.objects.filter(is_active=True)
-                .select_related('user__user')
+class PostsViewSet(ModelViewSet):
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return PostWriteSerializer
+        return PostReadSerializer
+
+    def get_queryset(self):
+        return (Post.objects.filter(is_active=True)
+                .select_related('user')
                 .prefetch_related('comments', 'likes', 'images')
-                )
+            )
+
+    @extend_schema(
+        request={
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "user": {"type": "integer"},
+                    "caption": {"type": "string"},
+                    "images": {
+                        "type": "array",
+                        "items": {"type": "string", "format": "binary"},
+                    },
+                },
+                "required": ["user"],
+            }
+        }
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @extend_schema(
+        request={
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "user": {"type": "integer"},
+                    "caption": {"type": "string"},
+                    "images": {
+                        "type": "array",
+                        "items": {"type": "string", "format": "binary"},
+                    },
+                },
+                "required": ["user"],
+            }
+        }
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)

@@ -1,6 +1,9 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
+
+from .permissions import IsOwnerOrReadOnly
 from .serializers import ProfileSerializer, PostWriteSerializer, PostReadSerializer
 from instagram.models import Profile, Post
 
@@ -11,10 +14,12 @@ class ProfilesViewSet(ModelViewSet):
                 .select_related('user')
                 .prefetch_related('comments', 'likes')
                 )
+    permission_classes = [IsOwnerOrReadOnly]
 
 
 class PostsViewSet(ModelViewSet):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
+    permission_classes = [IsOwnerOrReadOnly]
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:

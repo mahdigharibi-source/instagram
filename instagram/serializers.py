@@ -115,7 +115,6 @@ class PostWriteSerializer(serializers.ModelSerializer):
         model = Post
         fields = [
             "id",
-            "user",
             "caption",
             "images",
         ]
@@ -141,7 +140,9 @@ class PostWriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # عکس هارو از دیکشنری خارج میکنیم تا بهمون ارور نده و بتونیم پست بسازیم
         images = validated_data.pop("images", [])
-        post = Post.objects.create(**validated_data)
+        request = self.context.get("request")
+        user_profile = request.user.profile
+        post = Post.objects.create(user=user_profile, **validated_data)
         Images.objects.bulk_create(
             [Images(post=post , image=img) for img in images],
         )

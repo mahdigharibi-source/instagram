@@ -8,4 +8,4 @@ class CustomUser(AbstractUser):
     # posts
     # profile
     def __str__(self):
-        return self.phone_number
+        return f"{self.phone_number}"

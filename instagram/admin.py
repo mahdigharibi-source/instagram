@@ -1,8 +1,11 @@
+from django import forms
 from django.contrib import admin
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.utils.html import format_html
 from django.db.models import Count
 from accounts.models import CustomUser
-from .models import Post, Images, Comment, Profile
+from .models import Post, Images, Comment, Profile, Likes
+
 
 # ---------------------------------------------------------------------------
 # Inlines
@@ -21,7 +24,7 @@ class ImageInline(admin.TabularInline):
 
     @admin.display(description="Preview")
     def preview(self, obj):
-        if obj.image:
+        if obj.image.url:
             return format_html(
                 '<img src="{}" style="max-height:80px;border-radius:6px;" />',
                 obj.image.url,
@@ -131,6 +134,17 @@ class ProfileAdmin(admin.ModelAdmin):
 # ---------------------------------------------------------------------------
 
 
+class PostAdminForm(forms.ModelForm):
+    likes = forms.ModelMultipleChoiceField(
+        queryset=Profile.objects.all(),
+        widget=FilteredSelectMultiple("likes", is_stacked=False),
+        required=False,
+    )
+
+    class Meta:
+        model = Post
+        fields = "__all__"
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = (
@@ -155,6 +169,7 @@ class PostAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
     date_hierarchy = "created_at"
     ordering = ("-created_at",)
+    form = PostAdminForm
     list_per_page = 25
     list_select_related = ("user",)
 
@@ -249,3 +264,12 @@ class CommentAdmin(admin.ModelAdmin):
     @admin.display(description="Comment")
     def short_text(self, obj):
         return (obj.text[:80] + "…") if len(obj.text) > 80 else obj.text
+
+
+@admin.register(Likes)
+class LikesAdmin(admin.ModelAdmin):
+    model = Likes
+    fields = [
+        "user",
+        "post",
+    ]

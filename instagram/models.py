@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from accounts.models import CustomUser
 
@@ -27,7 +28,7 @@ class Profile(Base):
     # likes
 
     def __str__(self):
-        return self.username
+        return f"{self.username}"
 
 class Post(Base):
     user = models.ForeignKey(
@@ -41,7 +42,12 @@ class Post(Base):
     # comments
 
     def __str__(self):
-        return self.caption[:10]
+        return f"{self.caption[:10]}"
+
+    def clean(self):
+        super().clean()
+        if self.pk and not self.images.exists():
+            raise ValidationError("a post must have an image")
 
 class Images(Base):
     post = models.ForeignKey(
@@ -66,9 +72,7 @@ class Comment(Base):
     text = models.TextField(max_length=500)
 
     def __str__(self):
-        return self.text[:10]
-
-
+        return f"{self.text[:10]}"
 
 
 class Likes(Base):
